@@ -1,7 +1,0 @@
-{
-  "name": "faxina-backend",
-  "version": "1.0.0",
-  "description": "Lambda backend",
-  "main": "index.js",
-  "dependencies": {}
-}
