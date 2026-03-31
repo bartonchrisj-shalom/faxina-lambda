@@ -1,4 +1,4 @@
-name: Deploy Lambda Code Only
+name: Deploy Microservices
 
 on:
   push:
@@ -6,8 +6,19 @@ on:
       - main
 
 jobs:
-  deploy-code:
+  deploy-microservices:
     runs-on: ubuntu-latest
+    
+    # 1. THE MATRIX: Define your microservices and their physical Lambda names here
+    strategy:
+      matrix:
+        service:
+          - folder: users
+            function_name: faxina-app-BackendServiceFunction-yQIhuVGwU0RG
+            
+          # When you build your next feature, just add two lines here:
+          # - folder: flashcards
+          #   function_name: YOUR_PHYSICAL_FLASHCARDS_LAMBDA_NAME
 
     steps:
       - name: Checkout Code
@@ -18,27 +29,36 @@ jobs:
         with:
           node-version: '20'
 
-      # 1. Install dependencies inside your src folder
+      # 2. Install dependencies at the root level (where package.json lives)
       - name: Install Dependencies
-        working-directory: ./src
         run: npm ci
 
-      # 2. Package the code into a zip file
-      - name: Zip Code
-        working-directory: ./src
-        run: zip -r ../function.zip .
+      # 3. Bundle ONLY the specific microservice for this matrix run using esbuild
+      - name: Build with esbuild
+        run: >
+          npx esbuild src/functions/${{ matrix.service.folder }}/index.ts 
+          --bundle 
+          --minify 
+          --platform=node 
+          --target=node20 
+          --outfile=dist/${{ matrix.service.folder }}/index.js
 
-      # 3. Authenticate with AWS
+      # 4. Zip just that single bundled file (no node_modules!)
+      - name: Zip Code
+        working-directory: ./dist/${{ matrix.service.folder }}
+        run: zip function.zip index.js
+
+      # 5. Authenticate with AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Change if your region is different
+          aws-region: us-east-1
 
-      # 4. Push the zip directly to the Lambda function
+      # 6. Push the hyper-optimized zip to the correct Lambda
       - name: Update Lambda Function
         run: >
           aws lambda update-function-code 
-          --function-name faxina-app-BackendServiceFunction-yQIhuVGwU0RG 
-          --zip-file fileb://function.zip
+          --function-name ${{ matrix.service.function_name }} 
+          --zip-file fileb://dist/${{ matrix.service.folder }}/function.zip
