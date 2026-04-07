@@ -28,6 +28,18 @@ const baseHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxy
       };
     }
 
+    // Inside src/functions/users/index.ts (Admin route snippet)
+    if (method === 'POST' && path === '/users/invite') {
+      const groups = claims['cognito:groups'] || '';
+      if (!groups.includes('Admins')) {
+        return { statusCode: 403, body: JSON.stringify({ message: 'Forbidden: Admins only' }) };
+      }
+
+      const parsedBody = inviteUserSchema.parse(event.body); 
+      const result = await inviteUser(userId, parsedBody);
+      return { statusCode: 200, body: JSON.stringify(result) };
+    }
+    
     if (method === 'PUT') {
       // event.body is automatically parsed to a JSON object by Middy
       const parsedBody = updateUserSchema.parse(event.body); 

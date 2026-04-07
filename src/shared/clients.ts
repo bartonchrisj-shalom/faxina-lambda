@@ -1,16 +1,14 @@
+// src/shared/clients.ts
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
+import { CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 
-// 1. DynamoDB Setup
 const dbClient = new DynamoDBClient({});
 export const docClient = DynamoDBDocumentClient.from(dbClient, {
-  marshallOptions: {
-    removeUndefinedValues: true, // Automatically strips undefined fields before saving
-  },
+  marshallOptions: { removeUndefinedValues: true },
 });
 
-export const TABLE_NAME = process.env.TABLE_NAME || '';
+export const cognitoClient = new CognitoIdentityProviderClient({});
 
-// 2. Bedrock Setup (Ready for your AI features later)
-export const bedrockClient = new BedrockRuntimeClient({});
+export const TABLE_NAME = process.env.TABLE_NAME || '';
+export const USER_POOL_ID = process.env.USER_POOL_ID || '';

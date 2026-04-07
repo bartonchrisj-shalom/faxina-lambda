@@ -14,11 +14,10 @@ jobs:
       matrix:
         service:
           - folder: users
-            function_name: faxina-app-BackendServiceFunction-yQIhuVGwU0RG
+            function_name: faxina-app-UsersFunction-AlYDZdz30AZv
             
-          # When you build your next feature, just add two lines here:
-          # - folder: flashcards
-          #   function_name: YOUR_PHYSICAL_FLASHCARDS_LAMBDA_NAME
+           - folder: triggers\postAuth
+             function_name: faxina-app-PostAuthFunction-8vNOUyDSR7Q6
 
     steps:
       - name: Checkout Code

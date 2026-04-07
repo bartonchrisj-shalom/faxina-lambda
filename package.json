@@ -4,13 +4,16 @@
   "description": "Serverless TypeScript Backend",
   "main": "dist/index.js",
   "scripts": {
-    "build": "esbuild src/functions/users/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --outfile=dist/users/index.js"
+    "build:users": "esbuild src/functions/users/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --outfile=dist/users/index.js",
+    "build:postAuth": "esbuild src/functions/triggers/postAuth/index.ts --bundle --minify --sourcemap --platform=node --target=node20 --outfile=dist/triggers/postAuth/index.js",
+    "build": "npm run build:users && npm run build:postAuth"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.0.0",
     "@aws-sdk/client-bedrock-runtime": "^3.0.0",
     "@aws-sdk/client-dynamodb": "^3.0.0",
     "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.0.0",
     "@middy/core": "^5.0.0",
     "@middy/http-error-handler": "^5.0.0",
     "@middy/http-json-body-parser": "^5.0.0",
