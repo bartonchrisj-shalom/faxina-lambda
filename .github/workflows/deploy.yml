@@ -16,7 +16,7 @@ jobs:
           - folder: users
             function_name: faxina-app-UsersFunction-AlYDZdz30AZv
             
-          - folder: triggers\postAuth
+          - folder: triggers\postAuth\
             function_name: faxina-app-PostAuthFunction-8vNOUyDSR7Q6
 
     steps:
